@@ -158,9 +158,23 @@ HeapNode *HeapNode_floatUp(MMStack **stack)
 
 void HeapManager_incHeapParams(int *h, int *w)
 {
+    /* The height includes only complete rows so that the width of the current
+     * row can be calculated properly */
     if (++(*w) >= (1 << *h)) {
         *w = 0;
         (*h)++;
+    }
+}
+
+void HeapManager_decHeapParams(int *h, int *w)
+{
+    /* The height includes only complete rows so that the width of the current
+     * row can be calculated properly */
+    if (*w == 0) {
+        (*h)--;
+        *w = (1 << *h) - 1;
+    } else {
+        (*w)--;
     }
 }
 
@@ -290,6 +304,8 @@ int main(void)
         hm3.top = HeapNode_floatUp(&stack);
         HeapNode_print(hm3.top);
     }
+
+    /* TODO: remove last node and then remove maximum node. */
     return 0;
 }
 
