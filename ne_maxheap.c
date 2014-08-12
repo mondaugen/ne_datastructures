@@ -119,17 +119,21 @@ HeapNode *HeapNode_maxHeapify(HeapNode *grandparent, HeapNode *parent)
             }
             grandparent = parent; parent = largest;
         } else {
+            if (!top) { top = parent; }
             return top;
         }
     }
 }
 
-HeapNode **HeapNode_followToBottom(HeapNode *hn, int h, int w)
+HeapNode **HeapNode_followToBottom(HeapNode *hn, int h, int w, MMStack **stack)
 {
     int i;
     HeapNode **result;
     result = &hn;
     for (i = h - 1; i >= 0; i--) {
+        if (stack) {
+            *stack = MMStack_push(*stack,(void*)(*result));
+        }
         if (w & (1 << i)) {
             result = &((*result)->right);
         } else {
@@ -137,6 +141,19 @@ HeapNode **HeapNode_followToBottom(HeapNode *hn, int h, int w)
         }
     }
     return result;
+}
+
+HeapNode *HeapNode_floatUp(MMStack **stack)
+{
+    HeapNode *parent, *grandparent;
+    *stack = MMStack_pop(*stack,(void*) &parent);
+    *stack = MMStack_pop(*stack,(void*) &grandparent);
+    while (1) {
+        parent = HeapNode_maxHeapify(grandparent, parent);
+        if (!grandparent) { return parent; }
+        parent = grandparent;
+        *stack = MMStack_pop(*stack,(void**)&grandparent);
+    }
 }
 
 void HeapManager_incHeapParams(int *h, int *w)
@@ -147,15 +164,15 @@ void HeapManager_incHeapParams(int *h, int *w)
     }
 }
 
-HeapNode **HeapManager_findNextEmptyNode(HeapManager *hm)
+HeapNode **HeapManager_findNextEmptyNode(HeapManager *hm, MMStack **stack)
 {
     if (!hm->top) { return &(hm->top); }
-    return HeapNode_followToBottom(hm->top, hm->height, hm->width);
+    return HeapNode_followToBottom(hm->top, hm->height, hm->width, stack);
 }
 
-void HeapManager_insertHeapNode(HeapManager *hm, HeapNode *hn)
+void HeapManager_insertHeapNode(HeapManager *hm, HeapNode *hn, MMStack **stack)
 {
-    HeapNode **where = HeapManager_findNextEmptyNode(hm);
+    HeapNode **where = HeapManager_findNextEmptyNode(hm, stack);
     *where = hn;
     HeapManager_incHeapParams(&(hm->height), &(hm->width));
 }
@@ -202,7 +219,8 @@ int main(void)
 {
     int keys[] = {16, 4, 10, 14, 7, 9, 3, 2, 8, 1};
     int keys2[] = {4, 16, 10, 14, 7, 9, 3, 2, 8, 1};
-    int keys3[] = {4, 1, 3, 2, 16, 9, 10, 14, 8, 7};
+    int keys3[] = {16, 14, 10, 8, 7, 9, 3, 2, 4, 1};
+    int keys4[] = {20, 11, 3, 12};
     HeapManager hm;
     HeapManager_init(&hm);
     srand(time(NULL));
@@ -212,7 +230,7 @@ int main(void)
         hn->key = keys[i];
         hn->left = NULL;
         hn->right = NULL;
-        HeapManager_insertHeapNode(&hm,hn);
+        HeapManager_insertHeapNode(&hm,hn,NULL);
     }
     HeapNode_print(hm.top);
     /* Try out max heapify */
@@ -244,12 +262,34 @@ int main(void)
         hn->key = keys2[i];
         hn->left = NULL;
         hn->right = NULL;
-        HeapManager_insertHeapNode(&hm2,hn);
+        HeapManager_insertHeapNode(&hm2,hn,NULL);
     }
 
     HeapNode_print(hm2.top);
     if (tmp = HeapNode_maxHeapify(NULL,hm2.top)) { hm2.top = tmp; }
     HeapNode_print(hm2.top);
+
+    printf("Now the real deal: can we insert properly?\n");
+
+    HeapManager hm3;
+    HeapManager_init(&hm3);
+    for (i = 0; i < NUM_NODES; ++i) {
+        HeapNode *hn = (HeapNode*)malloc(sizeof(HeapNode));
+        hn->key = keys3[i];
+        hn->left = NULL;
+        hn->right = NULL;
+        HeapManager_insertHeapNode(&hm3,hn,NULL);
+    }
+    for (i = 0; i < 4; ++i) {
+        MMStack *stack = NULL;
+        HeapNode *bighn = (HeapNode*)malloc(sizeof(HeapNode));
+        bighn->key = keys4[i];
+        bighn->left = NULL;
+        bighn->right = NULL;
+        HeapManager_insertHeapNode(&hm3,bighn,&stack);
+        hm3.top = HeapNode_floatUp(&stack);
+        HeapNode_print(hm3.top);
+    }
     return 0;
 }
 
