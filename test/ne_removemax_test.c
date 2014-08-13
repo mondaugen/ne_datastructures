@@ -38,6 +38,7 @@ int main (int argc, char **argv)
         printf("Current max: %d\n",hn->key);
         HeapNode_print(hm.top);
         free(hn);
+        if (!(hm.height)
     }
 
     return 0;

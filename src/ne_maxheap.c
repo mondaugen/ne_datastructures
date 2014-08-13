@@ -310,6 +310,10 @@ HeapNode *HeapManager_removeMax(HeapManager *hm)
     hm->top = HeapNode_swapTopBottom(hm->top, bottomParent, &newBottomParent,
             *bottom, &newBottom);
     result = HeapNode_removeLastNode(newBottomParent,newBottom);
+    if (!newBottomParent) {
+        /* This was the last node, set hm->top to NULL */
+        hm->top = NULL;
+    }
     HeapManager_decHeapParams(&(hm->height),&(hm->width));
     hm->top = HeapNode_maxHeapify(NULL,hm->top);
     stack = MMStack_free(stack);
