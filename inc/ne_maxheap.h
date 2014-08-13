@@ -27,7 +27,7 @@ void HeapNode_init(HeapNode *hn, int key);
 void HeapNode_copy(HeapNode *dest, HeapNode *src);
 HeapNode *HeapNode_swapLeft(HeapNode *grandparent, HeapNode *parent);
 HeapNode *HeapNode_swapRight(HeapNode *grandparent, HeapNode *parent);
-HeapNode *HeapNode_swapTopBottom(HeapNode *top, HeapNode *bottomParent, HeapNode **bottom);
+HeapNode *HeapNode_swapTopBottom(HeapNode *top, HeapNode *bottomParent, HeapNode **newBottomParent, HeapNode *bottom, HeapNode **newBottom);
 HeapNode *HeapNode_maxHeapify(HeapNode *grandparent, HeapNode *parent);
 HeapNode **HeapNode_followToBottom(HeapNode *hn, int h, int w, MMStack **stack);
 void HeapNode_floatUp(HeapNode **hn, MMStack **stack);

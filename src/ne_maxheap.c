@@ -62,13 +62,25 @@ HeapNode *HeapNode_swapRight(HeapNode *grandparent, HeapNode *parent)
     return child;
 }
 
-HeapNode *HeapNode_swapTopBottom(HeapNode *top, HeapNode *bottomParent, HeapNode *bottom)
+/* Because this swaps the top and bottom, the address of the bottom will no
+ * longer be the bottom after the function is called. Furthermore, if the top is
+ * also the bottom's parent, which could happen on a heap of height 2, the
+ * bottomParent will no longer be correct after swapping. The address of the new
+ * top is returned, the address of the new bottomParent and new bottom are put
+ * in the respective pointers.
+ */
+HeapNode *HeapNode_swapTopBottom(HeapNode *top, HeapNode *bottomParent, HeapNode **newBottomParent,
+        HeapNode *bottom, HeapNode **newBottom)
 {
-    if ((!top) || (!bottomParent) || (!bottom) || (bottom->left) || (bottom->right)
+    if ((!top) || (!bottom) || (bottom->left) || (bottom->right)
             || (bottomParent == bottom)) {
         return NULL;
     }
-    if (top == bottom) { return top; }
+    if (top == bottom) {
+        *newBottomParent = bottomParent;
+        *newBottom = top;
+        return top;
+    }
     if (top == bottomParent) {
         if (bottomParent->left == bottom) {
             bottom->left = top;
@@ -79,6 +91,7 @@ HeapNode *HeapNode_swapTopBottom(HeapNode *top, HeapNode *bottomParent, HeapNode
         } else {
             return NULL; /* bad parent-bottom combination */
         }
+        *newBottomParent = bottom;
     } else {
         HeapNode *tmpleft = top->left;
         HeapNode *tmpright = top->right;
@@ -91,9 +104,11 @@ HeapNode *HeapNode_swapTopBottom(HeapNode *top, HeapNode *bottomParent, HeapNode
         }
         bottom->left = tmpleft;
         bottom->right = tmpright;
+        *newBottomParent = bottomParent;
     }
     top->left = NULL;
     top->right = NULL;
+    *newBottom = top;
     return bottom;
 }
 
@@ -184,7 +199,7 @@ void HeapNode_floatUp(HeapNode **hn, MMStack **stack)
 
 HeapNode *HeapNode_removeLastNode(HeapNode *parent, HeapNode *node)
 {
-    if (parent == node) {
+    if ((!node) || (parent == node)) {
         return NULL; /* please NO */
     }
     if (parent) {
@@ -282,12 +297,19 @@ int HeapManager_freeLastNode(HeapManager *hm, MMStack **stack)
 
 HeapNode *HeapManager_removeMax(HeapManager *hm)
 {
-    HeapNode **bottom, *bottomParent, *result, *tmp;
+    /* TODO: works pretty well, but hm->top should be set to NULL if it is the last
+     * node being removed */
+    HeapNode **bottom = NULL,
+             *bottomParent = NULL,
+             *newBottomParent = NULL,
+             *result = NULL,
+             *newBottom = NULL;
     MMStack *stack = NULL;
     bottom = HeapManager_findLastNode(hm,&stack);
     stack = MMStack_pop(stack,(void*)&bottomParent);
-    hm->top = HeapNode_swapTopBottom(hm->top, bottomParent, *bottom);
-    result = HeapNode_removeLastNode(bottomParent,*bottom);
+    hm->top = HeapNode_swapTopBottom(hm->top, bottomParent, &newBottomParent,
+            *bottom, &newBottom);
+    result = HeapNode_removeLastNode(newBottomParent,newBottom);
     HeapManager_decHeapParams(&(hm->height),&(hm->width));
     hm->top = HeapNode_maxHeapify(NULL,hm->top);
     stack = MMStack_free(stack);
