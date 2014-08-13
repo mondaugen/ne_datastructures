@@ -64,6 +64,7 @@ int main(void)
 
     HeapManager hm3;
     HeapManager_init(&hm3);
+    /*
     for (i = 0; i < NUM_NODES; ++i) {
         HeapNode *hn = (HeapNode*)malloc(sizeof(HeapNode));
         hn->key = keys3[i];
@@ -71,6 +72,8 @@ int main(void)
         hn->right = NULL;
         HeapManager_insertHeapNode(&hm3,hn,NULL);
     }
+    HeapNode_print(hm3.top);
+    */
     for (i = 0; i < 4; ++i) {
         MMStack *stack = NULL;
         HeapNode *bighn = (HeapNode*)malloc(sizeof(HeapNode));
@@ -78,7 +81,8 @@ int main(void)
         bighn->left = NULL;
         bighn->right = NULL;
         HeapManager_insertHeapNode(&hm3,bighn,&stack);
-        hm3.top = HeapNode_floatUp(&stack);
+        HeapNode_print(hm3.top);
+        HeapNode_floatUp(&(hm3.top),(&stack));
         HeapNode_print(hm3.top);
     }
 

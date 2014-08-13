@@ -162,14 +162,21 @@ HeapNode **HeapNode_followToBottom(HeapNode *hn, int h, int w, MMStack **stack)
     return result;
 }
 
-HeapNode *HeapNode_floatUp(MMStack **stack)
+/* This will float up the stack, all the way to the top of the heap, even when
+ * it is not swapping the places of the nodes (because the tree is already in
+ * heap order). */
+void HeapNode_floatUp(HeapNode **hn, MMStack **stack)
 {
+    /* If there's nothing in the stack, we can't do anything. */
+    if (!stack || (!*stack)) {
+        return;
+    }
     HeapNode *parent, *grandparent;
     *stack = MMStack_pop(*stack,(void*) &parent);
     *stack = MMStack_pop(*stack,(void*) &grandparent);
     while (1) {
         parent = HeapNode_maxHeapify(grandparent, parent);
-        if (!grandparent) { return parent; }
+        if (!grandparent) { *hn = parent; return; }
         parent = grandparent;
         *stack = MMStack_pop(*stack,(void**)&grandparent);
     }
@@ -245,6 +252,15 @@ void HeapManager_insertHeapNode(HeapManager *hm, HeapNode *hn, MMStack **stack)
     HeapManager_incHeapParams(&(hm->height), &(hm->width));
 }
 
+/* Inserts node and then floats it to its proper position, maintaining a max heap */
+void HeapManager_insertMaxHeapNode(HeapManager *hm, HeapNode *hn)
+{
+    MMStack *stack = NULL;
+    HeapManager_insertHeapNode(hm,hn,&stack);
+    HeapNode_floatUp(&(hm->top),&stack);
+    stack = MMStack_free(stack);
+}
+
 int HeapManager_freeLastNode(HeapManager *hm, MMStack **stack)
 {
     if (!stack) {
@@ -262,6 +278,20 @@ int HeapManager_freeLastNode(HeapManager *hm, MMStack **stack)
     }
     HeapManager_decHeapParams(&(hm->height),&(hm->width));
     return 0;
+}
+
+HeapNode *HeapManager_removeMax(HeapManager *hm)
+{
+    HeapNode **bottom, *bottomParent, *result, *tmp;
+    MMStack *stack = NULL;
+    bottom = HeapManager_findLastNode(hm,&stack);
+    stack = MMStack_pop(stack,(void*)&bottomParent);
+    hm->top = HeapNode_swapTopBottom(hm->top, bottomParent, *bottom);
+    result = HeapNode_removeLastNode(bottomParent,*bottom);
+    HeapManager_decHeapParams(&(hm->height),&(hm->width));
+    hm->top = HeapNode_maxHeapify(NULL,hm->top);
+    stack = MMStack_free(stack);
+    return result;
 }
 
 #define __swap(a,b,type) do { type __tmp; __tmp = a; a = b; b = __tmp; } while (0)
