@@ -1,10 +1,12 @@
 #include "mm_heap.h" 
+#include <string.h> 
 
 void MMHeap_swap(MMHeap_Node *a, MMHeap_Node *b)
 {
     MM_SWAP(a->data,b->data,void*);
     MM_SWAP(a->key,b->key, MMHeap_Key);
 }
+
 
 void MMHeap_makeMaxHeap(MMHeap_Node *hn)
 {
@@ -115,6 +117,11 @@ MMHeap_Node *MMHeap_Node_removeLastNode(MMHeap_Node *parent, MMHeap_Node *node)
         }
     }
     return node;
+}
+
+void MMHeap_Manager_init(MMHeap_Manager *hm)
+{
+    memset(hm,0,sizeof(hm));
 }
 
 void MMHeap_Manager_incHeapParams(MMHeap_Manager_Size *h, MMHeap_Manager_Size *w)
