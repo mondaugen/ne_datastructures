@@ -82,6 +82,7 @@ struct __MMHeap_Manager {
     MMHeap_Manager_Size  width;
 }; 
 
+void MMHeap_freeAll(MMHeap_Node *top);
 void MMHeap_Manager_insertMaxHeapNode(MMHeap_Manager *hm, MMHeap_Node *hn);
 MMHeap_Node *MMHeap_Manager_removeMax(MMHeap_Manager *hm);
 void MMHeap_Manager_insertMinHeapNode(MMHeap_Manager *hm, MMHeap_Node *hn);

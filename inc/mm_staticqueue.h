@@ -1,5 +1,6 @@
 #ifndef MM_STATICQUEUE_H
 #define MM_STATICQUEUE_H 
+
 #include <stdlib.h>
 
 typedef struct __MMStaticQueue MMStaticQueue;
