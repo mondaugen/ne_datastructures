@@ -90,6 +90,9 @@ static inline void MMHeap_swap(MMHeap_Node *a, MMHeap_Node *b)
 
 static inline void MMHeap_freeAll(MMHeap_Node *top)
 {
+    if (!top) {
+        return;
+    }
     if (top->left) {
         MMHeap_freeAll(top->left);
     }
