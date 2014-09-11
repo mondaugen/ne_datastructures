@@ -1,5 +1,7 @@
-#ifndef MM_QUEUE_H
-#define MM_QUEUE_H 
+#ifndef MM_QUEUE_CONTROLLER_H
+#define MM_QUEUE_CONTROLLER_H
+#include <stddef.h> 
+#include <string.h> 
 
 /* This kind of Queue can be set up with some array of pointers and manage queue
  * access */
@@ -13,9 +15,10 @@ struct __MMQueueController {
 };
 
 /* Make the array items into a queue controlled by this queue controller */
-void MMStaticQueue_init(MMQueueController *qc, void **items, size_t size)
+static inline void MMQueueController_init(MMQueueController *qc, void **items, size_t size)
 {
     memset(qc, 0, sizeof(MMQueueController));
+    memset(items, 0, sizeof(void*) * size);
     qc->size = size;
     qc->items = items;
 }
@@ -41,4 +44,4 @@ static inline void *MMQueueController_pop(MMQueueController *q)
     return result;
 }
 
-#endif /* MM_QUEUE_H */
+#endif /* MM_QUEUE_CONTROLLER_H */
