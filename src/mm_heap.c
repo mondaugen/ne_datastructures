@@ -131,7 +131,7 @@ MMHeap_Node *MMHeap_Node_removeLastNode(MMHeap_Node *parent, MMHeap_Node *node)
 
 void MMHeap_Manager_init(MMHeap_Manager *hm)
 {
-    memset(hm,0,sizeof(hm));
+    memset(hm,0,sizeof(MMHeap_Manager));
 }
 
 void MMHeap_Manager_incHeapParams(MMHeap_Manager_Size *h, MMHeap_Manager_Size *w)

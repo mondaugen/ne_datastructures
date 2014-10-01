@@ -132,7 +132,7 @@ HeapNode *HeapNode_maxHeapify(HeapNode *grandparent, HeapNode *parent)
         if (largest != parent) {
             HeapNode *tmp;
             if (largest == l) {
-                if(tmp = HeapNode_swapLeft(grandparent,parent)) {
+                if((tmp = HeapNode_swapLeft(grandparent,parent))) {
                     if (!top) { top = tmp; }
                     parent = tmp;
                     largest = parent->left;
@@ -142,7 +142,7 @@ HeapNode *HeapNode_maxHeapify(HeapNode *grandparent, HeapNode *parent)
                 }
             }
             else {
-                if(tmp = HeapNode_swapRight(grandparent,parent)) {
+                if((tmp = HeapNode_swapRight(grandparent,parent))) {
                     if (!top) { top = tmp; }
                     parent = tmp;
                     largest = parent->right;
