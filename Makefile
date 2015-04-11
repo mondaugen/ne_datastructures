@@ -2,7 +2,7 @@ NEDATASTRUCTURES_SRCS_PATH = src
 NEDATASTRUCTURES_SRCS      = $(wildcard $(NEDATASTRUCTURES_SRCS_PATH)/*.c)
 NEDATASTRUCTURES_INC_PATH  = inc
 NEDATASTRUCTURES_OBJS      = $(NEDATASTRUCTURES_SRCS:$(NEDATASTRUCTURES_SRCS_PATH)/%.c=objs/%.o)
-# this should also include the dependencies of external libraries
+# infortunately, everything rebuilds when only one header is changed
 NEDATASTRUCTURES_DEP       = $(wildcard $(NEDATASTRUCTURES_INC_PATH)/*.h)
 NEDATASTRUCTURES_CFLAGS	= -Ofast
 
